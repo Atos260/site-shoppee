@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofertas Imperdíveis | Shopee Finds</title>
+    
+    <!-- Tailwind CSS (Estilização Moderna e Rápida) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Ícones (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Configuração de Cores e Fontes -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        shopee: {
+                            primary: '#ee4d2d', // Laranja oficial Shopee
+                            dark: '#d03e1e',
+                            light: '#ff6b4a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Animações Suaves */
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- CABEÇALHO COM BARRA DE PESQUISA -->
+    <header class="bg-shopee-primary sticky top-0 z-50 shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                
+                <!-- Logo / Nome do Site -->
+                <div class="flex items-center gap-2 text-white font-bold text-2xl tracking-tight cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <i data-lucide="shopping-bag" class="w-8 h-8"></i>
+                    <span>Achadinhos<span class="text-yellow-300">Shopee</span></span>
+                </div>
+
+                <!-- Barra de Pesquisa -->
+                <div class="w-full max-w-xl relative">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Buscar produto (ex: fone, relógio)..." 
+                        class="w-full pl-10 pr-4 py-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-300 shadow-sm text-gray-700 outline-none transition-all"
+                    >
+                    <i data-lucide="search" class="absolute left-3 top-3.5 text-gray-400 w-5 h-5"></i>
+                </div>
+
+                <!-- Links / Menu (Opcional) -->
+                <div class="hidden md:flex text-white text-sm font-medium gap-6">
+                    <a href="#" class="hover:text-yellow-200 transition">Destaques</a>
+                    <a href="#" class="hover:text-yellow-200 transition">Cupons</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION (Banner Simples) -->
+    <div class="bg-gradient-to-r from-orange-100 to-orange-50 py-8 mb-6 border-b border-orange-100">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">As Melhores Ofertas Estão Aqui</h1>
+            <p class="text-gray-600">Garimpamos os melhores preços e produtos com envio rápido.</p>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL: LISTA DE PRODUTOS -->
+    <main class="flex-grow container mx-auto px-4 pb-12">
+        
+        <!-- Feedback de Pesquisa -->
+        <div id="searchFeedback" class="hidden mb-6 text-gray-600 font-medium">
+            Mostrando resultados para: <span id="searchTerm" class="text-shopee-primary font-bold"></span>
+            <button onclick="clearSearch()" class="ml-2 text-sm text-blue-500 hover:underline">(Limpar)</button>
+        </div>
+
+        <!-- Grid de Produtos -->
+        <div id="productsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+            <!-- Os produtos serão inseridos aqui via JavaScript -->
+        </div>
+
+        <!-- Estado Vazio (Sem resultados) -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
+            <i data-lucide="package-search" class="w-16 h-16 text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600">Nenhum produto encontrado</h3>
+            <p class="text-gray-500">Tente buscar por outro termo ou navegue pela lista completa.</p>
+            <button onclick="clearSearch()" class="mt-4 px-6 py-2 bg-shopee-primary text-white rounded-full hover:bg-shopee-dark transition">Ver todos os produtos</button>
+        </div>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="bg-white border-t border-gray-200 mt-auto py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-500 text-sm">
+                &copy; 2024 Achadinhos Shopee. Seleção de ofertas independentes.
+            </p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LÓGICA + DADOS -->
+    <script>
+        
+        /* ==========================================================================
+          ÁREA DE EDIÇÃO DO USUÁRIO (PRODUTOS.JS)
+          Edite esta lista abaixo para alterar os produtos do site.
+         ==========================================================================
+        */
+        const productList = [
+            {
+                id: 1,
+                name: "Fone de Ouvido Bluetooth Sem Fio TWS",
+                price: 29.90,
+                originalPrice: 89.90,
+                image: "https://down-br.img.susercontent.com/file/br-11134207-7r98o-lsi50j7q4q8r8e", // Exemplo de imagem
+                link: "https://shopee.com.br/produto-exemplo-1", // Coloque seu link de afiliado aqui
+                category: "Eletrônicos",
+                rating: 4.8,
+                sold: "5.2k"
+            },
+            {
+                id: 2,
+                name: "Smartwatch Relógio Inteligente D20",
+                price: 19.99,
+                originalPrice: 59.90,
+                image: "https://down-br.img.susercontent.com/file/br-11134207-7r98o-lxz6h9j7q4q8r8e", 
+                link: "https://shopee.com.br/produto-exemplo-2",
+                category: "Acessórios",
+                rating: 4.5,
+                sold: "12k"
+            },
+            {
+                id: 3,
+                name: "Mini Processador de Alimentos Manual",
+                price: 12.50,
+                originalPrice: 25.00,
+                image: "https://down-br.img.susercontent.com/file/br-11134207-7qukw-ljz6h9j7q4q8r8e", 
+                link: "https://shopee.com.br/produto-exemplo-3",
+                category: "Casa",
+                rating: 4.9,
+                sold: "20k"
+            },
+            {
+                id: 4,
+                name: "Kit 10 Pares de Meias Cano Curto",
+                price: 22.90,
+                originalPrice: 45.90,
+                image: "https://down-br.img.susercontent.com/file/br-11134207-7qukw-lkz6h9j7q4q8r8e", 
+                link: "https://shopee.com.br/produto-exemplo-4",
+                category: "Moda",
+                rating: 4.7,
+                sold: "8.5k"
+            },
+            {
+                id: 5,
+                name: "Ring Light de Mesa com Tripé",
+                price: 35.00,
+                originalPrice: 70.00,
+                image: "https://down-br.img.susercontent.com/file/br-11134207-7qukw-llz6h9j7q4q8r8e", 
+                link: "https://shopee.com.br/produto-exemplo-5",
+                category: "Eletrônicos",
+                rating: 4.6,
+                sold: "3.1k"
+            },
+            {
+                id: 6,
+                name: "Garrafa Térmica Digital com Sensor",
+                price: 24.99,
+                originalPrice: 55.00,
+                image: "https://down-br.img.susercontent.com/file/br-11134207-7qukw-lmz6h9j7q4q8r8e", 
+                link: "https://shopee.com.br/produto-exemplo-6",
+                category: "Casa",
+                rating: 4.8,
+                sold: "15k"
+            }
+        ];
+
+        /* ==========================================================================
+          LÓGICA DO SISTEMA (Não precisa alterar a menos que saiba JS)
+         ==========================================================================
+        */
+
+        const grid = document.getElementById('productsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const emptyState = document.getElementById('emptyState');
+        const searchFeedback = document.getElementById('searchFeedback');
+        const searchTermSpan = document.getElementById('searchTerm');
+
+        // Inicializar ícones
+        lucide.createIcons();
+
+        // Formatar Moeda
+        const formatCurrency = (value) => {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        };
+
+        // Gerar Card HTML
+        const createProductCard = (product) => {
+            // Calcular desconto
+            const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+            
+            // Imagem placeholder se a URL falhar (fallback)
+            const fallbackImage = "https://placehold.co/400x400/orange/white?text=Shopee+Oferta";
+
+            return `
+                <div class="product-card bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full relative group">
+                    
+                    <!-- Badge de Desconto -->
+                    <div class="absolute top-0 right-0 bg-yellow-400 text-shopee-primary text-xs font-bold px-2 py-1 z-10">
+                        -${discount}% OFF
+                    </div>
+
+                    <!-- Imagem -->
+                    <div class="relative w-full aspect-square overflow-hidden bg-gray-100">
+                        <img 
+                            src="${product.image}" 
+                            alt="${product.name}" 
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            onerror="this.src='${fallbackImage}'"
+                        >
+                        <!-- Overlay no hover -->
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
+                    </div>
+
+                    <!-- Conteúdo -->
+                    <div class="p-3 flex flex-col flex-grow">
+                        <h3 class="text-sm text-gray-800 font-medium line-clamp-2 mb-2 leading-tight flex-grow" title="${product.name}">
+                            ${product.name}
+                        </h3>
+                        
+                        <!-- Info Extra -->
+                        <div class="flex items-center gap-1 text-xs text-gray-500 mb-2">
+                            <i data-lucide="star" class="w-3 h-3 text-yellow-400 fill-yellow-400"></i>
+                            <span>${product.rating}</span>
+                            <span class="mx-1">•</span>
+                            <span>${product.sold} vendidos</span>
+                        </div>
+
+                        <!-- Preço -->
+                        <div class="mt-auto">
+                            <div class="text-xs text-gray-400 line-through">${formatCurrency(product.originalPrice)}</div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-shopee-primary text-lg font-bold">${formatCurrency(product.price)}</span>
+                            </div>
+                            
+                            <!-- Botão de Ação -->
+                            <a 
+                                href="${product.link}" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                onclick="handleClick('${product.name}')"
+                                class="mt-3 block w-full bg-shopee-primary hover:bg-shopee-dark text-white text-center text-sm font-semibold py-2 rounded transition-colors"
+                            >
+                                Ver Oferta
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        // Renderizar Produtos
+        const renderProducts = (productsToRender) => {
+            grid.innerHTML = ''; // Limpar grid
+
+            if (productsToRender.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.style.display = 'flex';
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.style.display = 'none';
+                grid.classList.remove('hidden');
+                
+                productsToRender.forEach(product => {
+                    grid.innerHTML += createProductCard(product);
+                });
+                
+                // Re-inicializar ícones nos novos elementos
+                lucide.createIcons();
+            }
+        };
+
+        // Função de Pesquisa
+        const handleSearch = (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            
+            if (term.length > 0) {
+                const filtered = productList.filter(product => 
+                    product.name.toLowerCase().includes(term) || 
+                    product.category.toLowerCase().includes(term)
+                );
+                
+                searchFeedback.classList.remove('hidden');
+                searchTermSpan.textContent = e.target.value;
+                renderProducts(filtered);
+            } else {
+                searchFeedback.classList.add('hidden');
+                renderProducts(productList);
+            }
+        };
+
+        // Limpar Pesquisa
+        window.clearSearch = () => {
+            searchInput.value = '';
+            searchFeedback.classList.add('hidden');
+            renderProducts(productList);
+        };
+
+        // Rastreamento simples (Simulação)
+        window.handleClick = (productName) => {
+            console.log(`Clique registrado para: ${productName}`);
+            // Aqui você poderia salvar no localStorage para fazer um ranking de "Mais clicados"
+        };
+
+        // Event Listeners
+        searchInput.addEventListener('input', handleSearch);
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts(productList);
+        });
+
+    </script>
+</body>
+</html>
