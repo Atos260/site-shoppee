@@ -49,6 +49,21 @@
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
+        
+        /* Botão do WhatsApp */
+        .whatsapp-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50%;
+            padding: 15px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 999;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
@@ -59,7 +74,7 @@
             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                 
                 <!-- Logo / Nome do Site -->
-                <div class="flex items-center gap-2 text-white font-bold text-2xl tracking-tight cursor-pointer" onclick="window.scrollTo(0,0)">
+               <div class="flex items-center gap-2 text-white font-bold text-2xl tracking-tight cursor-pointer" onclick="window.scrollTo(0,0)">
                     <i data-lucide="shopping-bag" class="w-8 h-8"></i>
                     <span>Launcher<span class="text-yellow-300">Achados</span></span>
                 </div>
@@ -73,12 +88,6 @@
                         class="w-full pl-10 pr-4 py-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-300 shadow-sm text-gray-700 outline-none transition-all"
                     >
                     <i data-lucide="search" class="absolute left-3 top-3.5 text-gray-400 w-5 h-5"></i>
-                </div>
-
-                <!-- Links / Menu (Opcional) -->
-                <div class="hidden md:flex text-white text-sm font-medium gap-6">
-                    <a href="#" class="hover:text-yellow-200 transition">Destaques</a>
-                    <a href="#" class="hover:text-yellow-200 transition">Cupons</a>
                 </div>
             </div>
         </div>
@@ -120,26 +129,25 @@
     <footer class="bg-white border-t border-gray-200 mt-auto py-8">
         <div class="container mx-auto px-4 text-center">
             <p class="text-gray-500 text-sm">
-                &copy; 2024 Achadinhos Shopee. Seleção de ofertas independentes.
+                &copy; 2024 Launcher Achados. Seleção de ofertas independentes.
             </p>
         </div>
     </footer>
 
+    <!-- BOTÃO FIXO DE WHATSAPP -->
+    <a href="https://wa.me/33984684394" target="_blank" class="whatsapp-button">
+        <i data-lucide="message-circle" class="w-6 h-6 text-white"></i>
+    </a>
+
     <!-- JAVASCRIPT LÓGICA + DADOS -->
     <script>
-        
-        /* ========================================================================== 
-          ÁREA DE EDIÇÃO DO USUÁRIO (PRODUTOS.JS) 
-          Edite esta lista abaixo para alterar os produtos do site. 
-         ========================================================================== 
-        */
         const productList = [
             {
                 id: 1,
                 name: "Deo Colônia Cebolinha 25ml - Jequiti",
                 price: 21.90,
                 originalPrice: 21.90,
-                image: "https://down-br.img.susercontent.com/file/sg-11134201-7rdxy-mc150e30sfgu96_tn",
+                image: "https://down-br.img.susercontent.com/file/sg-11134201-7rdxy-mc150e30sfgu96_tn", 
                 link: "https://s.shopee.com.br/2qOUuiGYkN",
                 category: "Beleza",
                 rating: 4.9,
@@ -165,7 +173,7 @@
                 link: "https://s.shopee.com.br/2Vlehf5Apa",
                 category: "Moda",
                 rating: 4.7,
-                sold: "100k"
+                sold: "100k",
             },
             {
                 id: 4,
@@ -176,7 +184,7 @@
                 link: "https://s.shopee.com.br/6pudfQYsjg",
                 category: "Casa",
                 rating: 4.8,
-                sold: "1M"
+                sold: "1M",
             },
             {
                 id: 5,
@@ -187,7 +195,7 @@
                 link: "https://s.shopee.com.br/7fTkfIAEXZ",
                 category: "Moda",
                 rating: 4.7,
-                sold: "40k"
+                sold: "40k",
             },
             {
                 id: 6,
@@ -202,60 +210,45 @@
             }
         ];
 
-        /* ========================================================================== 
-          LÓGICA DO SISTEMA (Não precisa alterar a menos que saiba JS) 
-         ========================================================================== 
-        */
-
         const grid = document.getElementById('productsGrid');
         const searchInput = document.getElementById('searchInput');
         const emptyState = document.getElementById('emptyState');
         const searchFeedback = document.getElementById('searchFeedback');
         const searchTermSpan = document.getElementById('searchTerm');
 
-        // Inicializar ícones
-        lucide.createIcons();
+        lucide.createIcons(); // Inicializa ícones
 
-        // Formatar Moeda
         const formatCurrency = (value) => {
             return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
         };
 
-        // Gerar Card HTML
         const createProductCard = (product) => {
-            // Calcular desconto
             const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
-            
-            // Imagem placeholder se a URL falhar (fallback)
             const fallbackImage = "https://placehold.co/400x400/orange/white?text=Shopee+Oferta";
 
             return `
                 <div class="product-card bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full relative group">
-                    
-                    <!-- Badge de Desconto -->
                     <div class="absolute top-0 right-0 bg-yellow-400 text-shopee-primary text-xs font-bold px-2 py-1 z-10">
                         -${discount}% OFF
                     </div>
 
-                    <!-- Imagem -->
                     <div class="relative w-full aspect-square overflow-hidden bg-gray-100">
-                        <img 
-                            src="${product.image}" 
-                            alt="${product.name}" 
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            onerror="this.src='${fallbackImage}'"
-                        >
-                        <!-- Overlay no hover -->
+                        <a href="${product.link}" target="_blank">
+                            <img 
+                                src="${product.image}" 
+                                alt="${product.name}" 
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                onerror="this.src='${fallbackImage}'"
+                            >
+                        </a>
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
                     </div>
 
-                    <!-- Conteúdo -->
                     <div class="p-3 flex flex-col flex-grow">
                         <h3 class="text-sm text-gray-800 font-medium line-clamp-2 mb-2 leading-tight flex-grow" title="${product.name}">
                             ${product.name}
                         </h3>
                         
-                        <!-- Info Extra -->
                         <div class="flex items-center gap-1 text-xs text-gray-500 mb-2">
                             <i data-lucide="star" class="w-3 h-3 text-yellow-400 fill-yellow-400"></i>
                             <span>${product.rating}</span>
@@ -263,19 +256,15 @@
                             <span>${product.sold} vendidos</span>
                         </div>
 
-                        <!-- Preço -->
                         <div class="mt-auto">
                             <div class="text-xs text-gray-400 line-through">${formatCurrency(product.originalPrice)}</div>
                             <div class="flex items-center justify-between">
                                 <span class="text-shopee-primary text-lg font-bold">${formatCurrency(product.price)}</span>
                             </div>
                             
-                            <!-- Botão de Ação -->
                             <a 
                                 href="${product.link}" 
                                 target="_blank" 
-                                rel="noopener noreferrer"
-                                onclick="handleClick('${product.name}')"
                                 class="mt-3 block w-full bg-shopee-primary hover:bg-shopee-dark text-white text-center text-sm font-semibold py-2 rounded transition-colors"
                             >
                                 Ver Oferta
@@ -286,9 +275,8 @@
             `;
         };
 
-        // Renderizar Produtos
         const renderProducts = (productsToRender) => {
-            grid.innerHTML = ''; // Limpar grid
+            grid.innerHTML = '';
 
             if (productsToRender.length === 0) {
                 grid.classList.add('hidden');
@@ -303,12 +291,10 @@
                     grid.innerHTML += createProductCard(product);
                 });
                 
-                // Re-inicializar ícones nos novos elementos
                 lucide.createIcons();
             }
         };
 
-        // Função de Pesquisa
         const handleSearch = (e) => {
             const term = e.target.value.toLowerCase().trim();
             
@@ -327,42 +313,20 @@
             }
         };
 
-        // Limpar Pesquisa
         window.clearSearch = () => {
             searchInput.value = '';
             searchFeedback.classList.add('hidden');
             renderProducts(productList);
         };
 
-        // Rastreamento simples (Simulação)
-        window.handleClick = (productName) => {
-            console.log(`Clique registrado para: ${productName}`);
-            // Aqui você poderia salvar no localStorage para fazer um ranking de "Mais clicados"
-        };
-
-        // Event Listeners
-        searchInput.addEventListener('input', handleSearch);
-
-        // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             renderProducts(productList);
         });
 
+        searchInput.addEventListener('input', handleSearch);
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
