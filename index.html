@@ -154,7 +154,40 @@
     <script>
         // Array de produtos
         const productList = [
-            // Adicione seus produtos aqui, como antes
+            {
+                id: 1,
+                name: "Deo Colônia Cebolinha 25ml - Jequiti",
+                price: 21.90,
+                originalPrice: 21.90,
+                image: "https://down-br.img.susercontent.com/file/sg-11134201-7rdxy-mc150e30sfgu96_tn", 
+                link: "https://s.shopee.com.br/2qOUuiGYkN",
+                category: "Beleza",
+                rating: 4.9,
+                sold: "90k"
+            },
+            {
+                id: 2,
+                name: "Varal De Chão Torre 3 Andares Retrátil Compacto, Dobrável e com Rodinhas",
+                price: 69.99,
+                originalPrice: 149.90,
+                image: "https://down-br.img.susercontent.com/file/br-11134207-7r98o-m7z8j51xhnu92f@resize_w450_nl.webp",
+                link: "https://s.shopee.com.br/40aSDKw4Ul",
+                category: "limpeza",
+                rating: 4.8,
+                sold: "10k"
+            },
+            {
+                id: 3,
+                name: "Calça Pantalona Alfaiataria Premium Com Bolso PROMOÇÃO",
+                price: 34.80,
+                originalPrice: 129.90,
+                image: "https://down-bs-br.img.susercontent.com/br-11134207-7r98o-ma4qg4onmdjb35.webp",
+                link: "https://s.shopee.com.br/2Vlehf5Apa",
+                category: "Moda",
+                rating: 4.7,
+                sold: "100k",
+            },
+            // Adicione o restante dos produtos aqui...
         ];
 
         const grid = document.getElementById('productsGrid');
@@ -163,7 +196,7 @@
         const searchFeedback = document.getElementById('searchFeedback');
         const searchTermSpan = document.getElementById('searchTerm');
 
-        lucide.createIcons();
+        lucide.createIcons(); // Inicializa ícones
 
         const formatCurrency = (value) => {
             return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -248,7 +281,7 @@
 
                 // Animação do cachorro
                 document.getElementById('dog').style.transform = 'translateX(10%)';
-                canvasConfetti(); // Chuva de confetes
+                setTimeout(() => canvasConfetti(), 1000); // Chuva de confetes depois que terminar de digitar
             } else {
                 searchFeedback.classList.add('hidden');
                 renderProducts(productList);
@@ -287,3 +320,5 @@
     </script>
 </body>
 </html>
+
+
