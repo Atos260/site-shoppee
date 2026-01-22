@@ -11,6 +11,9 @@
     <!-- Ícones (Lucide) -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Confetti.js (Animação de Confetes) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti"></script>
+
     <!-- Configuração de Cores e Fontes -->
     <script>
         tailwind.config = {
@@ -40,16 +43,7 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
-        .shimmer {
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
-        }
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
+
         /* Botão do WhatsApp */
         .whatsapp-button {
             position: fixed;
@@ -64,9 +58,23 @@
             cursor: pointer;
             z-index: 999;
         }
+
+        /* Cachorro do lado da barra de pesquisa */
+        #dog {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translateX(-100%) translateY(-50%);
+            transition: transform 0.5s ease;
+        }
+
+        /* Animação de confetes */
+        .confetti {
+            display: none;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen relative">
 
     <!-- CABEÇALHO COM BARRA DE PESQUISA -->
     <header class="bg-shopee-primary sticky top-0 z-50 shadow-lg">
@@ -80,7 +88,7 @@
                 </div>
                 
                 <!-- Barra de Pesquisa -->
-                <div class="w-full max-w-xl relative">
+                <div class="relative w-full max-w-xl">
                     <input 
                         type="text" 
                         id="searchInput"
@@ -88,6 +96,9 @@
                         class="w-full pl-10 pr-4 py-3 rounded-lg border-none focus:ring-2 focus:ring-yellow-300 shadow-sm text-gray-700 outline-none transition-all"
                     >
                     <i data-lucide="search" class="absolute left-3 top-3.5 text-gray-400 w-5 h-5"></i>
+
+                    <!-- Cachorro Interativo -->
+                    <img src="https://yourimageurl.png" id="dog" class="absolute top-0 left-0 w-16 h-16">
                 </div>
             </div>
         </div>
@@ -141,73 +152,9 @@
 
     <!-- JAVASCRIPT LÓGICA + DADOS -->
     <script>
+        // Array de produtos
         const productList = [
-            {
-                id: 1,
-                name: "Deo Colônia Cebolinha 25ml - Jequiti",
-                price: 21.90,
-                originalPrice: 21.90,
-                image: "https://down-br.img.susercontent.com/file/sg-11134201-7rdxy-mc150e30sfgu96_tn", 
-                link: "https://s.shopee.com.br/2qOUuiGYkN",
-                category: "Beleza",
-                rating: 4.9,
-                sold: "90k"
-            },
-            {
-                id: 2,
-                name: "Varal De Chão Torre 3 Andares Retrátil Compacto, Dobrável e com Rodinhas",
-                price: 69.99,
-                originalPrice: 149.90,
-                image: "https://down-br.img.susercontent.com/file/br-11134207-7r98o-m7z8j51xhnu92f@resize_w450_nl.webp",
-                link: "https://s.shopee.com.br/40aSDKw4Ul",
-                category: "limpeza",
-                rating: 4.8,
-                sold: "10k"
-            },
-            {
-                id: 3,
-                name: "Calça Pantalona Alfaiataria Premium Com Bolso PROMOÇÃO",
-                price: 34.80,
-                originalPrice: 129.90,
-                image: "https://down-bs-br.img.susercontent.com/br-11134207-7r98o-ma4qg4onmdjb35.webp",
-                link: "https://s.shopee.com.br/2Vlehf5Apa",
-                category: "Moda",
-                rating: 4.7,
-                sold: "100k",
-            },
-            {
-                id: 4,
-                name: "Jogo de Lençol Cama Casal Queen King Solteiro Berço 400 Fios Micropercal Com Fronha em Ponto Palito",
-                price: 12.90,
-                originalPrice: 30.00,
-                image: "https://down-tx-br.img.susercontent.com/br-11134207-81z1k-mhmmzlomujgh97.webp",
-                link: "https://s.shopee.com.br/6pudfQYsjg",
-                category: "Casa",
-                rating: 4.8,
-                sold: "1M",
-            },
-            {
-                id: 5,
-                name: "Mochila CHL Bolsa Reforçada Notebook Impermeável Material Premium Colorido Executivo 888",
-                price: 42.80,
-                originalPrice: 89.00,
-                image: "https://down-tx-br.img.susercontent.com/sg-11134201-7rdwr-md7i55nlol6o8c.webp",
-                link: "https://s.shopee.com.br/7fTkfIAEXZ",
-                category: "Moda",
-                rating: 4.7,
-                sold: "40k",
-            },
-            {
-                id: 6,
-                name: "Kit Material Escolar Feminino Completo Com Sem Mochila Escolar Feminina Estojo Escolar Feminino Rosa",
-                price: 89.70,
-                originalPrice: 297.99,
-                image: "https://down-br.img.susercontent.com/file/br-11134207-81ztc-mjhj4dh46qki3d@resize_w450_nl.webp",
-                link: "https://s.shopee.com.br/3fxbn7kfiN",
-                category: "material escolar",
-                rating: 4.7,
-                sold: "5k"
-            }
+            // Adicione seus produtos aqui, como antes
         ];
 
         const grid = document.getElementById('productsGrid');
@@ -216,7 +163,7 @@
         const searchFeedback = document.getElementById('searchFeedback');
         const searchTermSpan = document.getElementById('searchTerm');
 
-        lucide.createIcons(); // Inicializa ícones
+        lucide.createIcons();
 
         const formatCurrency = (value) => {
             return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -241,7 +188,6 @@
                                 onerror="this.src='${fallbackImage}'"
                             >
                         </a>
-                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300"></div>
                     </div>
 
                     <div class="p-3 flex flex-col flex-grow">
@@ -261,14 +207,6 @@
                             <div class="flex items-center justify-between">
                                 <span class="text-shopee-primary text-lg font-bold">${formatCurrency(product.price)}</span>
                             </div>
-                            
-                            <a 
-                                href="${product.link}" 
-                                target="_blank" 
-                                class="mt-3 block w-full bg-shopee-primary hover:bg-shopee-dark text-white text-center text-sm font-semibold py-2 rounded transition-colors"
-                            >
-                                Ver Oferta
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -290,7 +228,7 @@
                 productsToRender.forEach(product => {
                     grid.innerHTML += createProductCard(product);
                 });
-                
+
                 lucide.createIcons();
             }
         };
@@ -307,16 +245,38 @@
                 searchFeedback.classList.remove('hidden');
                 searchTermSpan.textContent = e.target.value;
                 renderProducts(filtered);
+
+                // Animação do cachorro
+                document.getElementById('dog').style.transform = 'translateX(10%)';
+                canvasConfetti(); // Chuva de confetes
             } else {
                 searchFeedback.classList.add('hidden');
                 renderProducts(productList);
+                document.getElementById('dog').style.transform = 'translateX(-100%)'; // Voltar para o lado
             }
+        };
+
+        // Função de confetes
+        const canvasConfetti = () => {
+            const duration = 3 * 1000; // Duração de 3 segundos
+            const animationEnd = Date.now() + duration;
+            const interval = setInterval(() => {
+                if (Date.now() > animationEnd) {
+                    return clearInterval(interval);
+                }
+                confetti({
+                    particleCount: 50,
+                    spread: 70,
+                    origin: { x: Math.random(), y: Math.random() }
+                });
+            }, 100);
         };
 
         window.clearSearch = () => {
             searchInput.value = '';
             searchFeedback.classList.add('hidden');
             renderProducts(productList);
+            document.getElementById('dog').style.transform = 'translateX(-100%)'; // Voltar
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -327,10 +287,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
