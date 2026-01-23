@@ -9,39 +9,48 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti"></script>
 
-<script>
-tailwind.config = {
-theme: {
-extend: {
-colors: {
-shopee: {
-primary: '#ee4d2d',
-dark: '#d03e1e'
-}
-}
-}
-}
-</script>
+<!-- Fonte caligráfica -->
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
 
 <style>
-.product-card{transition:.3s}
-.product-card:hover{transform:translateY(-5px)}
-.whatsapp-button{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#25d366;
-border-radius:50%;
-padding:15px;
-z-index:999;
+.product-card { transition: all .3s ease; }
+.product-card:hover { transform: translateY(-5px); }
+
+.whatsapp-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25d366;
+  color: white;
+  padding: 15px;
+  border-radius: 50%;
+  z-index: 999;
+}
+
+#suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.1);
+  z-index: 50;
+}
+#suggestions div {
+  padding: 10px;
+  cursor: pointer;
+}
+#suggestions div:hover {
+  background: #f3f3f3;
 }
 </style>
 </head>
 
 <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
 
-<header class="bg-shopee-primary sticky top-0 z-50 shadow-lg">
-<div class="container mx-auto px-4 py-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+<header class="bg-orange-500 sticky top-0 z-50 shadow-lg">
+<div class="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
 
 <div onclick="goHome()" class="flex items-center gap-2 text-white font-bold text-2xl cursor-pointer">
 <i data-lucide="shopping-bag"></i>
@@ -49,39 +58,47 @@ z-index:999;
 </div>
 
 <div class="relative w-full max-w-xl">
-<input id="searchInput" type="text"
-placeholder="Buscar produto (ex: perfume, calça...)"
-class="w-full pl-10 pr-14 py-3 rounded-lg shadow focus:ring-2 focus:ring-yellow-300">
-
+<input id="searchInput" type="text" placeholder="Buscar produto..."
+class="w-full pl-10 pr-20 py-3 rounded-lg outline-none">
 <i data-lucide="search" class="absolute left-3 top-3.5 text-gray-400"></i>
 
 <button onclick="searchProducts()"
-class="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-400 w-10 h-10 rounded-full flex items-center justify-center">
+class="absolute right-2 top-2 bg-yellow-400 px-4 py-2 rounded-lg font-bold">
 🔍
 </button>
+
+<div id="suggestions" class="hidden"></div>
 </div>
+
+<button onclick="goHome()" class="text-white font-semibold">Home</button>
+
 </div>
 </header>
 
-<div class="bg-white py-4 text-center italic font-semibold text-gray-700">
-“Tudo posso naquele que me fortalece.” — Filipenses 4:13
+<main class="container mx-auto px-4 pb-12">
+
+<!-- FRASE BÍBLICA -->
+<div class="text-center my-8">
+<p class="text-2xl text-gray-700" style="font-family: 'Dancing Script', cursive;">
+“Tudo posso naquele que me fortalece.”
+</p>
+<span class="text-sm text-gray-500">Filipenses 4:13</span>
 </div>
 
-<main class="flex-grow container mx-auto px-4 py-10">
-<div id="productsGrid"
-class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-</div>
+<div id="productsGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
 </main>
 
 <footer class="bg-white border-t py-6 text-center text-sm text-gray-500">
-© 2024 Atos.Promos — Seleção independente de ofertas
+© 2024 Atos.Promos — Seleção de ofertas independentes
 </footer>
 
 <a href="https://wa.me/5533984684394" target="_blank" class="whatsapp-button">
-<i data-lucide="message-circle" class="text-white"></i>
+<i data-lucide="message-circle"></i>
 </a>
 
 <script>
+lucide.createIcons();
+
 const productList = [
 {
 id:1,
@@ -90,20 +107,22 @@ price:21.90,
 originalPrice:21.90,
 image:"https://down-br.img.susercontent.com/file/sg-11134201-7rdxy-mc150e30sfgu96_tn",
 link:"https://s.shopee.com.br/2qOUuiGYkN",
-category:"perfume colônia jequiti",
+category:"Beleza",
 rating:4.9,
-sold:"90k"
+sold:"90k",
+keywords:["perfume","colônia","cebolinha","cheiro","infantil"]
 },
 {
 id:2,
-name:"Varal De Chão Torre 3 Andares Retrátil Compacto",
+name:"Varal De Chão Torre 3 Andares Retrátil",
 price:69.99,
 originalPrice:149.90,
 image:"https://down-br.img.susercontent.com/file/br-11134207-7r98o-m7z8j51xhnu92f@resize_w450_nl.webp",
 link:"https://s.shopee.com.br/40aSDKw4Ul",
-category:"casa limpeza varal",
+category:"Casa",
 rating:4.8,
-sold:"10k"
+sold:"10k",
+keywords:["varal","roupa","lavanderia","secagem"]
 },
 {
 id:3,
@@ -112,81 +131,80 @@ price:34.80,
 originalPrice:129.90,
 image:"https://down-bs-br.img.susercontent.com/br-11134207-7r98o-ma4qg4onmdjb35.webp",
 link:"https://s.shopee.com.br/2Vlehf5Apa",
-category:"moda feminina calça",
+category:"Moda",
 rating:4.7,
-sold:"100k"
+sold:"100k",
+keywords:["calça","pantalona","moda","roupa feminina"]
 }
 ];
 
-const grid=document.getElementById("productsGrid");
-const input=document.getElementById("searchInput");
+const grid = document.getElementById("productsGrid");
+const searchInput = document.getElementById("searchInput");
+const suggestions = document.getElementById("suggestions");
 
-function formatCurrency(v){
-return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
-}
-
-function createProductCard(p){
-const discount=Math.round(((p.originalPrice-p.price)/p.originalPrice)*100);
-return `
-<a href="${p.link}" target="_blank"
-class="product-card bg-white rounded-lg shadow-sm border overflow-hidden relative flex flex-col">
-
-<div class="absolute top-0 right-0 bg-yellow-400 text-shopee-primary text-xs font-bold px-2 py-1">
--${discount}% OFF
-</div>
-
-<div class="aspect-square bg-gray-100">
-<img src="${p.image}" class="w-full h-full object-cover">
-</div>
-
-<div class="p-3 flex flex-col flex-grow">
-<h3 class="text-sm font-medium mb-2">${p.name}</h3>
-
-<div class="text-xs text-gray-500 mb-2">
-⭐ ${p.rating} • ${p.sold} vendidos
-</div>
-
-<div class="mt-auto">
-<div class="text-xs text-gray-400 line-through">${formatCurrency(p.originalPrice)}</div>
-<div class="text-shopee-primary text-lg font-bold">${formatCurrency(p.price)}</div>
-
-<div class="mt-2 bg-shopee-primary text-white text-center py-2 rounded font-semibold">
-Ver Oferta
-</div>
-</div>
-</div>
-</a>`;
-}
-
-function renderProducts(list){
+function render(list){
 grid.innerHTML="";
-list.forEach(p=>grid.innerHTML+=createProductCard(p));
-lucide.createIcons();
+list.forEach(p=>{
+const discount=Math.round(((p.originalPrice-p.price)/p.originalPrice)*100);
+grid.innerHTML+=`
+<a href="${p.link}" target="_blank"
+class="product-card bg-white rounded-lg shadow p-3 flex flex-col">
+<span class="text-xs bg-yellow-400 self-end px-2 rounded">-${discount}%</span>
+<img src="${p.image}" class="rounded mb-2 aspect-square object-cover">
+<h3 class="text-sm font-semibold">${p.name}</h3>
+<div class="text-xs text-gray-500">⭐ ${p.rating} • ${p.sold}</div>
+<div class="text-xs line-through text-gray-400">R$ ${p.originalPrice}</div>
+<div class="font-bold text-orange-500">R$ ${p.price}</div>
+</a>`;
+});
 }
 
 function searchProducts(){
-confetti({particleCount:80,spread:70});
+const term=searchInput.value.toLowerCase();
+const filtered=productList.filter(p=>
+p.name.toLowerCase().includes(term) ||
+p.category.toLowerCase().includes(term) ||
+p.keywords.some(k=>k.includes(term))
+);
+render(filtered);
+confetti({particleCount:50,spread:70});
+suggestions.classList.add("hidden");
 }
 
+searchInput.addEventListener("input",()=>{
+const term=searchInput.value.toLowerCase();
+if(!term){ suggestions.classList.add("hidden"); return; }
+
+let allWords=new Set();
+productList.forEach(p=>{
+p.keywords.forEach(k=>{
+if(k.includes(term)) allWords.add(k);
+});
+});
+
+suggestions.innerHTML="";
+[...allWords].slice(0,5).forEach(w=>{
+const div=document.createElement("div");
+div.textContent=w;
+div.onclick=()=>{ searchInput.value=w; searchProducts(); };
+suggestions.appendChild(div);
+});
+suggestions.classList.toggle("hidden", allWords.size===0);
+});
+
 function goHome(){
-input.value="";
-renderProducts(productList);
+searchInput.value="";
+render(productList);
 window.scrollTo({top:0,behavior:"smooth"});
 }
 
-input.addEventListener("input",()=>{
-const v=input.value.toLowerCase();
-if(!v){renderProducts(productList);return;}
-renderProducts(productList.filter(p=>
-p.name.toLowerCase().includes(v)||p.category.includes(v)
-));
-});
-
-document.addEventListener("DOMContentLoaded",()=>renderProducts(productList));
+render(productList);
 </script>
 
 </body>
 </html>
+
+
 
 
 
