@@ -16,15 +16,71 @@
 .product-card { transition: all .3s ease; }
 .product-card:hover { transform: translateY(-5px); }
 
-.whatsapp-button {
+.whatsapp-button, .chatbot-button {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #25d366;
-  color: white;
   padding: 15px;
   border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 999;
+  cursor: pointer;
+}
+
+.whatsapp-button { background: #25d366; }
+.chatbot-button { background: #f59e0b; right: 80px; }
+
+#chatbot-window {
+  position: fixed;
+  bottom: 80px;
+  right: 80px;
+  width: 300px;
+  max-height: 400px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.2);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+#chatbot-header {
+  background: #f59e0b;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+#chatbot-messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+#chatbot-input {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+
+#chatbot-input input {
+  flex: 1;
+  border: none;
+  padding: 8px;
+  outline: none;
+}
+
+#chatbot-input button {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
 }
 
 #suggestions {
@@ -62,7 +118,6 @@
 class="w-full pl-10 pr-20 py-3 rounded-lg outline-none">
 <i data-lucide="search" class="absolute left-3 top-3.5 text-gray-400"></i>
 
-<!-- BOTÃO PESQUISA ALINHADO -->
 <button onclick="searchProducts()"
 class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 px-4 py-2 rounded-lg font-bold">
 🔍
@@ -71,7 +126,6 @@ class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-yellow-400 px-4 py
 <div id="suggestions" class="hidden"></div>
 </div>
 
-<!-- BOTÃO HOME DESTACADO -->
 <button onclick="goHome()" class="bg-yellow-400 px-4 py-2 rounded-lg font-bold text-white hover:bg-yellow-500">
 Home
 </button>
@@ -80,8 +134,6 @@ Home
 </header>
 
 <main class="container mx-auto px-4 pb-12">
-
-<!-- FRASE BÍBLICA -->
 <div class="text-center my-8">
 <p class="text-2xl text-gray-700" style="font-family: 'Dancing Script', cursive;">
 “Tudo posso naquele que me fortalece.”
@@ -100,9 +152,23 @@ Home
 <i data-lucide="message-circle"></i>
 </a>
 
+<div class="chatbot-button" onclick="toggleChatbot()">
+<i data-lucide="message-square"></i>
+</div>
+
+<div id="chatbot-window" class="flex flex-col">
+<div id="chatbot-header">Atendimento Automático</div>
+<div id="chatbot-messages"></div>
+<div id="chatbot-input">
+<input id="chatbotText" type="text" placeholder="Digite sua pergunta...">
+<button onclick="sendChat()">Enviar</button>
+</div>
+</div>
+
 <script>
 lucide.createIcons();
 
+// ---------- PRODUTOS ----------
 const productList = [
 {
 id:1,
@@ -202,10 +268,67 @@ window.scrollTo({top:0,behavior:"smooth"});
 }
 
 render(productList);
+
+// ---------- CHATBOT INTELIGENTE ----------
+const chatbotWindow = document.getElementById("chatbot-window");
+const chatbotMessages = document.getElementById("chatbot-messages");
+const chatbotText = document.getElementById("chatbotText");
+
+function toggleChatbot(){
+  chatbotWindow.style.display = chatbotWindow.style.display === "flex" ? "none" : "flex";
+}
+
+function sendChat(){
+  const msg = chatbotText.value.trim();
+  if(!msg) return;
+  appendMessage("Você: " + msg);
+  chatbotText.value = "";
+  let reply = generateReply(msg.toLowerCase());
+  appendMessage("Bot: " + reply);
+  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+function appendMessage(msg){
+  const div = document.createElement("div");
+  div.textContent = msg;
+  div.classList.add("mb-2");
+  chatbotMessages.appendChild(div);
+}
+
+function generateReply(msg){
+  // Frases padrões
+  const greetings = ["olá","oi","bom dia","boa tarde","boa noite"];
+  for(const g of greetings){
+    if(msg.includes(g)) return "Olá! Que bom te ver aqui 😄 Posso te ajudar a encontrar alguma oferta?";
+  }
+
+  // Procurar produto pelo nome ou keywords
+  for(const p of productList){
+    if(msg.includes(p.name.toLowerCase()) || p.keywords.some(k=>msg.includes(k))){
+      return `Ah, temos o produto "${p.name}" disponível por R$${p.price.toFixed(2)}! Você pode conferir clicando no card do produto 😉`;
+    }
+  }
+
+  // Sugestão automática baseada em categoria
+  for(const p of productList){
+    if(msg.includes(p.category.toLowerCase())){
+      return `Você está interessado em ${p.category}? Olha esse produto que temos: "${p.name}" por R$${p.price.toFixed(2)}!`;
+    }
+  }
+
+  // Mensagens genéricas
+  const fallback = [
+    "Desculpe, não entendi muito bem 😅. Quer que eu sugira algum produto?",
+    "Hum... não entendi. Você quer ver alguma oferta especial?",
+    "Estou aqui para ajudar! Pode me dizer o nome de um produto ou categoria que você procura?"
+  ];
+  return fallback[Math.floor(Math.random()*fallback.length)];
+}
 </script>
 
 </body>
 </html>
+
 
 
 
