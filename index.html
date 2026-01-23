@@ -269,7 +269,8 @@ window.scrollTo({top:0,behavior:"smooth"});
 
 render(productList);
 
-// ---------- CHATBOT INTELIGENTE ----------
+<script>
+// ---------- CHATBOT INTELIGENTE TURBINADO ----------
 const chatbotWindow = document.getElementById("chatbot-window");
 const chatbotMessages = document.getElementById("chatbot-messages");
 const chatbotText = document.getElementById("chatbotText");
@@ -278,56 +279,103 @@ function toggleChatbot(){
   chatbotWindow.style.display = chatbotWindow.style.display === "flex" ? "none" : "flex";
 }
 
+// Botão interno de reiniciar conversa
+function restartChat(){
+  chatbotMessages.innerHTML = "";
+  appendMessage("Bot: Olá! 😊 Vamos começar de novo. Quer que eu te mostre as melhores ofertas do dia?");
+}
+
 function sendChat(){
   const msg = chatbotText.value.trim();
   if(!msg) return;
   appendMessage("Você: " + msg);
   chatbotText.value = "";
-  let reply = generateReply(msg.toLowerCase());
-  appendMessage("Bot: " + reply);
-  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+  setTimeout(()=>{
+    let reply = generateReply(msg.toLowerCase());
+    appendMessage("Bot: " + reply);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+  }, 300); // Pequeno delay para parecer humano
 }
 
 function appendMessage(msg){
   const div = document.createElement("div");
-  div.textContent = msg;
+  div.innerHTML = msg; // Permitindo HTML para links e botões
   div.classList.add("mb-2");
   chatbotMessages.appendChild(div);
 }
 
+// Função para gerar respostas inteligentes
 function generateReply(msg){
-  // Frases padrões
+  // Saudações
   const greetings = ["olá","oi","bom dia","boa tarde","boa noite"];
   for(const g of greetings){
-    if(msg.includes(g)) return "Olá! Que bom te ver aqui 😄 Posso te ajudar a encontrar alguma oferta?";
+    if(msg.includes(g)) return "Oi! 😄 Que bom te ver por aqui! Posso te mostrar algumas promoções ou produtos em destaque?";
   }
 
-  // Procurar produto pelo nome ou keywords
-  for(const p of productList){
-    if(msg.includes(p.name.toLowerCase()) || p.keywords.some(k=>msg.includes(k))){
-      return `Ah, temos o produto "${p.name}" disponível por R$${p.price.toFixed(2)}! Você pode conferir clicando no card do produto 😉`;
+  // Procurar produtos pelo nome ou keywords
+  const matchedProducts = productList.filter(p=>
+    msg.includes(p.name.toLowerCase()) || p.keywords.some(k=>msg.includes(k))
+  );
+
+  if(matchedProducts.length > 0){
+    let html = "Olha só, encontrei alguns produtos que combinam com o que você procura:<br>";
+    matchedProducts.slice(0,3).forEach(p=>{
+      html += `• <a href="${p.link}" target="_blank" style="color:#f59e0b; font-weight:bold;">${p.name}</a> - R$${p.price.toFixed(2)}<br>`;
+    });
+    html += `<button onclick="restartChat()" style="margin-top:5px; padding:5px 10px; background:#f59e0b; color:white; border:none; border-radius:5px; cursor:pointer;">🔄 Reiniciar Conversa</button>`;
+    return html;
+  }
+
+  // Sugestões por categoria
+  const matchedCategories = productList.filter(p=>msg.includes(p.category.toLowerCase()));
+  if(matchedCategories.length > 0){
+    let html = `Você está olhando para ${matchedCategories[0].category}? Olha alguns produtos legais:<br>`;
+    matchedCategories.slice(0,3).forEach(p=>{
+      html += `• <a href="${p.link}" target="_blank" style="color:#f59e0b; font-weight:bold;">${p.name}</a> - R$${p.price.toFixed(2)}<br>`;
+    });
+    html += `<button onclick="restartChat()" style="margin-top:5px; padding:5px 10px; background:#f59e0b; color:white; border:none; border-radius:5px; cursor:pointer;">🔄 Reiniciar Conversa</button>`;
+    return html;
+  }
+
+  // Promoções e produtos mais vendidos
+  const topDiscounts = productList.filter(p=>p.originalPrice > p.price).sort((a,b)=>b.originalPrice-b.price);
+  const bestSellers = productList.sort((a,b)=>parseInt(b.sold.replace('k','')) - parseInt(a.sold.replace('k','')));
+  if(msg.includes("promoção") || msg.includes("desconto")){
+    if(topDiscounts.length > 0){
+      let html = "Olha essas promoções quentinhas 🔥:<br>";
+      topDiscounts.slice(0,3).forEach(p=>{
+        html += `• <a href="${p.link}" target="_blank" style="color:#f59e0b; font-weight:bold;">${p.name}</a> - de R$${p.originalPrice.toFixed(2)} por R$${p.price.toFixed(2)}<br>`;
+      });
+      html += `<button onclick="restartChat()" style="margin-top:5px; padding:5px 10px; background:#f59e0b; color:white; border:none; border-radius:5px; cursor:pointer;">🔄 Reiniciar Conversa</button>`;
+      return html;
     }
   }
 
-  // Sugestão automática baseada em categoria
-  for(const p of productList){
-    if(msg.includes(p.category.toLowerCase())){
-      return `Você está interessado em ${p.category}? Olha esse produto que temos: "${p.name}" por R$${p.price.toFixed(2)}!`;
-    }
+  if(msg.includes("mais vendido") || msg.includes("top")){
+    let html = "Estes são os produtos mais vendidos 🏆:<br>";
+    bestSellers.slice(0,3).forEach(p=>{
+      html += `• <a href="${p.link}" target="_blank" style="color:#f59e0b; font-weight:bold;">${p.name}</a> - ⭐ ${p.rating} • ${p.sold}<br>`;
+    });
+    html += `<button onclick="restartChat()" style="margin-top:5px; padding:5px 10px; background:#f59e0b; color:white; border:none; border-radius:5px; cursor:pointer;">🔄 Reiniciar Conversa</button>`;
+    return html;
   }
 
-  // Mensagens genéricas
-  const fallback = [
-    "Desculpe, não entendi muito bem 😅. Quer que eu sugira algum produto?",
-    "Hum... não entendi. Você quer ver alguma oferta especial?",
-    "Estou aqui para ajudar! Pode me dizer o nome de um produto ou categoria que você procura?"
+  // Resposta quando produto não existe
+  const fallbackResponses = [
+    "Poxa, não encontramos exatamente isso 😅. Mas temos outras ofertas incríveis! Quer que eu mostre?",
+    "Ops! Este produto está fora de estoque 😔. Em breve teremos mais novidades!",
+    "Humm... ainda não temos esse item, mas posso te mostrar produtos similares com desconto 😉",
+    "Não encontrei isso no momento, mas temos várias promoções que você vai adorar!"
   ];
-  return fallback[Math.floor(Math.random()*fallback.length)];
+  let html = fallbackResponses[Math.floor(Math.random()*fallbackResponses.length)];
+  html += `<br><button onclick="restartChat()" style="margin-top:5px; padding:5px 10px; background:#f59e0b; color:white; border:none; border-radius:5px; cursor:pointer;">🔄 Reiniciar Conversa</button>`;
+  return html;
 }
 </script>
 
 </body>
 </html>
+
 
 
 
